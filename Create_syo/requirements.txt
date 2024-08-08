@@ -1,0 +1,7 @@
+pandas
+openpyxl
+streamlit
+re
+streamlit_extras.grid
+decouple
+sqlalchemy

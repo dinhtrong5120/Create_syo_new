@@ -1,0 +1,2 @@
+- Các câu query 4 cột đầu cho từng xe đã chuyển thành tất cả các xe => Thỏa mãn điều kiện Tất cả các xe có form như nhau. 
+- Đã viết xong function chỉnh sửa led halogen cũng như levelizer

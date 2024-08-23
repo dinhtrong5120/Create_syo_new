@@ -7,6 +7,21 @@ st.set_page_config(
     page_icon=":smiley:",
     layout="wide"
 )
+# light = '''
+# <style>
+#     .stApp {
+#         background-color: white;
+#     }
+#     # .stButton > button { /* Thay đổi màu nền của nút */
+#     #     background-color: gray;
+#     # }
+#     # .stTextInput > div > div > input { /* Thay đổi màu nền của input text */
+#     #     background-color: darkgray;
+#     # }
+#     # /* ... và tiếp tục cho các thành phần khác */
+# </style>
+# '''
+# st.markdown(light, unsafe_allow_html=True)
 #
 # page_bg_img = '''
 #     <style>
@@ -29,10 +44,13 @@ def reset_data():
         st.session_state['data'] = {}
 
 
-if 1 == 2:
+if 1 == 1:
     try:
         if st.session_state.position == "admin" or st.session_state.position == "master":
-            admin_prokan()
+            try:
+                admin_all_1()
+            except Exception as e:
+                st.error(f"Error: {e}")
         elif st.session_state.position == "staff":
             try:
                 user_read_only_syo_hyo()
@@ -41,7 +59,13 @@ if 1 == 2:
         else:
             st.warning("Please login before running app!!!")
     except:
-        st.warning("Please login before running app!!!")
+        if 'position' not in st.session_state:
+            st.warning("Please login before running app!!!")
+        else:
+            try:
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error : {e}")
 else:
     if st.session_state.position == "admin" or st.session_state.position == "master":
         admin_all_1()

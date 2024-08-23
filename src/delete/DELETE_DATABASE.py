@@ -43,7 +43,7 @@ def delete_database():
         st.session_state.data_frame1 = st.data_editor(all_project, key='editor1', height=500, width=1000)
         delete1_placeholder = st.empty()
         with delete1_placeholder.container():
-            col1_empty, col1_delete, col1_empty2 = st.columns([4, 1, 4])
+            col1_empty, col1_delete, col1_empty2 = st.columns([4, 2, 4])
             with col1_delete:
                 if st.button("DELETE", key='delete1'):
                     df_after_deleted = delete_project_syo(st.session_state.data_frame1)
@@ -58,7 +58,7 @@ def delete_database():
         st.session_state.data_frame2 = st.data_editor(all_project, key='editor2', height=500, width=1000)
         delete2_placeholder = st.empty()
         with delete2_placeholder.container():
-            col2_empty, col2_delete, col2_empty2 = st.columns([4, 1, 4])
+            col2_empty, col2_delete, col2_empty2 = st.columns([4, 2, 4])
             with col2_delete:
                 if st.button("DELETE", key='delete2'):
                     df_after_deleted = delete_project__(st.session_state.data_frame2)

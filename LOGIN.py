@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="Login Page",
     page_icon="👋",
 )
-st.header("# Welcome to No1. Prokan! 👋")
+st.header("# Welcome to Website プロ管集約業務1本化! 👋")
 
 username = st.text_input("Username")
 password = st.text_input("Password", type="password")
@@ -25,7 +25,7 @@ if st.button("Login"):
         st.session_state.name_user = name_user
         st.session_state.project_query = project_query
         st.success("Login successful!")
-        st.switch_page("pages/ALL APP.py")
+        st.switch_page("pages/1 HOME.py")
     else:
         st.session_state.position = None
         st.error("Login failed. Please check your credentials.")
@@ -37,14 +37,14 @@ def open_url(url):
 
 
 # Nếu nút login đã được bấm, hiển thị thêm 2 nút
-if st.session_state.button_clicked and st.session_state.position is not None:
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("仕様表作成"):
-            st.switch_page("pages/仕様表作成.py")
-    with col2:
-        if st.button("プロ管集約"):
-            st.switch_page("pages/APP PAGE.py")
+#if st.session_state.button_clicked and st.session_state.position is not None:
+    #col1, col2 = st.columns(2)
+    #with col1:
+        #if st.button("仕様表作成"):
+            #st.switch_page("pages/仕様表作成.py")
+    #with col2:
+        #if st.button("プロ管集約"):
+            #st.switch_page("pages/APP PAGE.py")
 # import pandas as pd
 # import streamlit as st
 # from io import BytesIO

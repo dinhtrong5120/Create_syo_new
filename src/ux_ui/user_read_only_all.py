@@ -83,13 +83,17 @@ def user_read_only_prokan():
 def view_prokan(position):
     button_select_caout_grid = grid(2, 1, 4, vertical_align="top")
     row_butt = st.columns(6)
-    selected_option_output_select = button_select_caout_grid.selectbox("SELECT OUTPUT",
-                                                                       ["CADICS 項目", "仕様表", "FORM", "仕様表FORM",
-                                                                        "Car配車要望表",
+    option = ["CADICS 項目", "仕様表", "FORM", "仕様表FORM","Car配車要望表",
                                                                         "WTC仕様用途一覧表",
                                                                         "WTC要望集約兼チェックリスト",
                                                                         "実験部品", "特性管理部品リスト",
-                                                                        "File Log"])
+                                                                        "File Log"]
+    if "selected_option" not in st.session_state:
+        st.session_state.selected_option = option[0]
+    a = st.session_state.selected_option
+    selected_option_output_select = button_select_caout_grid.selectbox("SELECT OUTPUT",option,index=option.index(st.session_state.selected_option))
+    st.session_state.selected_option = selected_option_output_select
+    b = st.session_state.selected_option
     # area for table output
 
     if get_data_prokan("flag_view") == 1:
@@ -290,6 +294,8 @@ def view_prokan(position):
         data_empty = pd.DataFrame(data_empty, columns=column_names)
         data_empty = data_empty.fillna("")
         button_select_caout_grid.dataframe(data_empty, height=525, width=10000)
+    if a != b:
+        st.rerun()
 
 
 def set_state_db_prokan(session, project_id, app_list):

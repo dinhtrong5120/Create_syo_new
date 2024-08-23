@@ -57,7 +57,7 @@ def process_dataframe(df_):
     # Lọc các hàng hợp lệ
     valid_df = df_[~df_['group_key_map'].isin([None, '', 'default_key', np.nan])]
     if not valid_df.empty:
-        valid_df.to_excel(r"C:\Users\KNT21617\Downloads\output file\valid_df.xlsx")
+        # valid_df.to_excel(r"C:\Users\KNT21617\Downloads\output file\valid_df.xlsx")
         # Lấy danh sách các cột bắt đầu bằng 'conf-'
         conf_cols = [col for col in df_.columns if str(col).startswith('conf-')]
 

@@ -308,7 +308,6 @@ def create_syo(form_syo, data_for_create):
                     LIST_HIENTHI = ["ALL", "-"]
                 option = keyword_col_C.replace("(ALL)", "")
                 option = option.replace("(w,w/o)", "").upper()
-                # print('option: ', option)
                 nhap(form_syo, data_spec, index, col_option, dict_option_code, col_start_config, col_end_config,
                      col_option_code, col_attribute, column_name, class_option, option, LIST_HIENTHI)
             else:
@@ -318,7 +317,6 @@ def create_syo(form_syo, data_for_create):
                     try:
                         result_yes = re.search(r'\(([^()]+)\)$', item).group(1)
                         result_yes_split = result_yes.split(",")
-                        # print('result_yes_split: ',result_yes_split)
                         if len(result_yes_split) == 1:
                             LIST_HIENTHI = [result_yes_split[0], "-"]
                         else:
@@ -329,12 +327,7 @@ def create_syo(form_syo, data_for_create):
                              col_option_code, col_attribute, column_name, class_option, option, LIST_HIENTHI)
 
                     except:
-                        # print('item: ', item)
                         LIST_HIENTHI = [item, "-"]
-                        # list_opt = re.split(r"[✚+]", item)
-                        # for option in list_opt:
-                        #     option = option.strip().upper()
-                        #     print('option: ', option)
                         option = item.strip().upper()
                         nhap(form_syo, data_spec, index, col_option, dict_option_code, col_start_config,
                              col_end_config,
@@ -374,8 +367,6 @@ def nhap(form_syo, data_spec, index, col_option, dict_option_code, col_start_con
         result = result.reset_index(drop=True)
         list_data = option_in_A(result, dict_option_code, col_start_config, col_end_config,
                                 col_option_code, col_attribute, 1)
-        # print('list_data1: ', list_data)
-        # print('LIST_HIENTHI: ', LIST_HIENTHI)
         if LIST_HIENTHI != ["ALL", "-"]:
             replacement_value = LIST_HIENTHI[0]
             for i in range(len(list_data)):
@@ -390,14 +381,11 @@ def nhap(form_syo, data_spec, index, col_option, dict_option_code, col_start_con
                     except:
                         pass
     else:
-        # Search option in column D in Speclist
         result = data_spec[data_spec[column_name[-1]] == class_option]  # 1 là cột class
         if LIST_HIENTHI == ["ALL", "-"]:
             LIST_HIENTHI = ["w", "w/o"]
-        # print("LIST_HIENTHI: ", LIST_HIENTHI)
         list_data = option_in_D(option, result, dict_option_code, col_start_config, col_end_config,
                                 col_option_code, col_attribute, col_option, LIST_HIENTHI)
-        # print('list_data2: ', list_data)
     col_start = 4
 
     for item in list_data:
@@ -486,7 +474,6 @@ def option_in_A(result, dict_option_code, col_start_config, col_end_config,
 
 def option_in_D(attribute, result, dict_option_code, col_start_config, col_end_config,
                 col_option_code, col_attribute, col_option, LIST_HIENTHI):
-    print('LIST_HIENTHI in option_in_D: ', LIST_HIENTHI)
     list_vip = []
     if '✚' in attribute or '+' in attribute:
         list_attribute = re.split(r"[✚+]", attribute)
@@ -522,9 +509,6 @@ def option_in_D(attribute, result, dict_option_code, col_start_config, col_end_c
             else:
                 list_data = [LIST_HIENTHI[1]] * (col_end_config - col_start_config)
                 return list_data
-        # if list_vip == list_attribute:
-        #     list_data = list(dict_check.values())
-        # else:
         list_data = list(dict_check_1.values())
         if LIST_HIENTHI == ['w', 'w/o']:
             for i in range(len(list_data)):

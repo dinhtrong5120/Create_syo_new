@@ -105,12 +105,12 @@ def process_dataframe(df_):
         return df_
 
 
-if __name__ == '__main__':
-    path_file = r"C:\Users\KNT21617\Downloads\output file\仕様表_WZ1L.xlsx"
-    df = pd.read_excel(path_file)
-    # result = logic_add(df)
-    df_1 = logic_add(df)
-    print(df_1)
-    df_2 = process_dataframe(df_1)
-    df_2.to_excel(r"C:\Users\KNT21617\Downloads\output file\仕様表_WZ1L_lol_3.xlsx")
-    print('result: ', df_2)
+# if __name__ == '__main__':
+#     path_file = r"C:\Users\KNT21617\Downloads\output file\仕様表_WZ1L.xlsx"
+#     df = pd.read_excel(path_file)
+#     # result = logic_add(df)
+#     df_1 = logic_add(df)
+#     print(df_1)
+#     df_2 = process_dataframe(df_1)
+#     df_2.to_excel(r"C:\Users\KNT21617\Downloads\output file\仕様表_WZ1L_lol_3.xlsx")
+#     print('result: ', df_2)

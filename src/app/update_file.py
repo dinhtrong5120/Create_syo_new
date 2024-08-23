@@ -41,15 +41,19 @@ def update_file_into_server_new(car_name, List_file, csrf_token):
     if csrf_token != get_csrf_token():
         st.error("Invalid CSRF token. This request is not allowed.")
         st.session_state.message_3 = "Invalid CSRF token. This request is not allowed."
-        # return
     for file in List_file:
+        # st.write('file: ', file.name)
         if (file.name in ['仕様表.zip', '仕様表.7z']) or (
                 file.name.startswith('仕様表') and 'FORM' not in file.name.upper()):
             folder_save_file_upload = os.path.join('./data', "仕様表")
-            if os.path.exists(folder_save_file_upload):
-                shutil.rmtree(folder_save_file_upload)
-            os.makedirs(folder_save_file_upload)
+            # st.write('folder_save_file_upload: ',folder_save_file_upload)
+            # if os.path.exists(folder_save_file_upload):
+            #     shutil.rmtree(folder_save_file_upload)
+            if not os.path.exists(folder_save_file_upload):
+                os.makedirs(folder_save_file_upload)
+
             file_path = os.path.join(folder_save_file_upload, file.name)
+            # st.write('file_path: ', file_path)
             with open(file_path, "wb") as f:
                 f.write(file.getvalue())
 
@@ -75,33 +79,25 @@ def update_file_into_server_new(car_name, List_file, csrf_token):
 def update_file_after_edit(code, pwt, plant, case, file_updates, csrf_token, name_user):
     flag = 0
     if csrf_token != get_csrf_token():
-        # st.error("Invalid CSRF token. This request is not allowed.")
         st.session_state.message_3 = "Invalid CSRF token. This request is not allowed."
         return "Invalid CSRF token. This request is not allowed."
     for file_update in file_updates:
         if file_update.name == "CADICS_ALL.csv":
             flag = 1
             if code != "" and code != None:
-                # try:
                 new_data = pd.read_csv(file_update, header=None)
                 folder_name = str(name_user).upper() + "_" + str(code).upper() + "_" + str(pwt).upper() + "_" + str(
                     plant).upper() + "_" + str(case).upper()
                 folder_save_file_update = os.path.join('./cadic_temp', folder_name, "CADICS_ALL.csv")
-                # st.warning(folder_save_file_update)
                 if not os.path.exists(folder_save_file_update):
                     return "FAIL: There is no cadic references"
                 else:
                     old_data = pd.read_csv(folder_save_file_update, header=None)
                     offline_edit(str(code).upper(), plant, pwt, case, new_data, old_data)
                     return "Update Completed!!!"
-
-            # except:
-            #     return "FAIL: ERROR CADICS_ALL.csv!!!"
-
             else:
                 return "Project not exist!!!"
     if flag == 0:
-        # return "FAIL: Files not CADICS_ALL.csv!!!"
         return ""
 
 
@@ -143,6 +139,7 @@ def extract(file_path, output_dir):
         folder = file_path[0:len(file_path) - 3]
     move_all_items(folder, output_dir)
     delete_folder(folder)
+
 
 def move_all_items(source_dir, destination_dir):
     # Tạo thư mục đích nếu nó không tồn tại

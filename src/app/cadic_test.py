@@ -15,13 +15,8 @@ from src.app.check_option import check_option
 from src.app.log_file_error import check_document
 from src.db.funtion_database import update_new, get_header
 from src.ux_ui.read_data_view import frame_empty
-# from check_option_new_v2_done_1 import check_option_new
-# from checvk_option_new_v3 import check_option_new
 from src.app.check_option_new_v4 import check_option_new_v4
 from src.app.get_item_edit_1 import get_item
-
-
-# from check_option_plus import get_item
 def create_cadics_new(case, market, powertrain, car, list_group):
     # working = os.path.dirname(__file__)
     folder_name = str(car).upper() + "_" + powertrain + "_" + market + "_" + case

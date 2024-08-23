@@ -34,12 +34,30 @@ def region_3(result_querry_region3):
     return df_3
 
 
-def  region_4(results_querry_region_4, index_df_1):
+def region_4(results_querry_region_4, index_df_1):
     df_4_begin = pd.DataFrame(results_querry_region_4,
                               columns=['device_group', 'device_name', 'auto', 'group_detail', 'option_detail',
                                        'device_details_name', 'group_key_map', 'default'])
-    # streamlit.write('df_4_begin: ', df_4_begin)
-    df_4_sorted = df_4_begin.sort_values(by=['device_group', 'device_name'])
+    list_sap_xep = ['UNKNOW_device', 'LIGHTING', 'GLASSES', 'SIDE VIEW MIRROR / CAMERA', 'REAR VIEW MIRROR / CAMERA',
+                    'COMBI METER', 'HMI',
+                    'PHYSICAL SWITCHES', 'STEERING', 'PEDALS AND FOOT-REST', 'GEAR SHIFT', 'PARKING BRAKE',
+                    'WINDOW OPENING', 'SUN VISOR', 'DRIVER SEAT', 'ASSIST SEAT', '2ND ROW SEAT', 'HEADREST', 'TRIM',
+                    '1ST ROW STORAGE', '2ND ROW STORAGE', 'TRUNK / LUGGAGE STORAGE', 'FUNCTIONAL LIGHTING',
+                    'AMBIENT LIGHTING', 'PASSENGER SUPPORT', 'INNER PROTECTION', 'CARPETS',
+                    'TYPE OF INTERIOR DECORATION',
+                    'AMENITY', 'AIR CONDITIONING AND HEATING', 'AIR QUALITY MANAGEMENT', 'AUDIO & NAVIGATION',
+                    'SPEAKERS',
+                    'SOUND BUBBLE', 'NVH MANAGEMENT', 'ACCESS', 'OPENING', 'PROTECTION', 'ACCESSORY', 'LOGO & EMBLEM',
+                    'SUSPENSION', 'BRAKING', 'DRIVING MODE', 'ECO DRIVING AIDS', 'TIRES', 'WHEELS & WHEEL COVERS',
+                    'SPARE WHEEL', 'ADAS COMFORT', 'ADAS SAFETY', 'ADAS PARKING', 'WARNING & ALERT', 'AIRBAGS',
+                    'SEAT BELT',
+                    'OTHER', 'SPECIFICATION', 'CHARGER', 'PLUG / CABLE', 'EV DEDICATED FEATURES']
+    # Tạo cột ánh xạ thứ tự cho `device_name`
+    df_4_begin['device_name_order'] = df_4_begin['device_name'].apply(
+        lambda x: list_sap_xep.index(x) if x in list_sap_xep else len(list_sap_xep))
+    df_4_sorted = df_4_begin.sort_values(by=['device_group', 'device_name_order'])
+    df_4_sorted = df_4_sorted.drop(columns=['device_name_order'])
+
     # streamlit.write('df_4_sorted: ', df_4_sorted)
     column_max_list = df_4_sorted.iloc[:, 0].tolist()
     unique_list_max = list(set(column_max_list))
@@ -53,6 +71,7 @@ def  region_4(results_querry_region_4, index_df_1):
     col_CADICS_ID = []
     col_group_key_map = []
     col_default = []
+    col_device_name = []
     for row in result_tuple:
         col_auto.extend([row[0], row[1], row[2]])
         col_gr.extend(['', '', row[3]])
@@ -60,19 +79,24 @@ def  region_4(results_querry_region_4, index_df_1):
         col_CADICS_ID.extend(['', '', row[5]])
         col_group_key_map.extend(['', '', row[6]])
         col_default.extend(['', '', row[7]])
+        col_device_name.extend(['', '', row[1]])
     df_4 = pd.DataFrame({
         'auto': col_auto,
         'gr': col_gr,
         'keyword': col_keyword,
         'CADICS ID': col_CADICS_ID,
         'group_key_map': col_group_key_map,
-        'default': col_default
+        'default': col_default,
+        'device_name': col_device_name
     })
-    df_null_rows = df_4[df_4['auto'] == '']
-
-    df_non_null_rows = df_4[df_4['auto'] != '']
+    # df_null_rows = df_4[df_4['auto'] == '']
+    df_null_rows = df_4[(df_4['auto'] == '') | (df_4['CADICS ID'] != '')]
+    # streamlit.write('df_null_rows region1: ', df_null_rows)
+    df_non_null_rows = df_4[(df_4['auto'] != '') & (df_4['CADICS ID'] == '')]
+    # streamlit.write('df_non_null_rows region1: ', df_non_null_rows)
     df_non_null_deduplicated = df_non_null_rows.drop_duplicates(subset=['auto'], keep='first')
     df_4 = pd.concat([df_null_rows, df_non_null_deduplicated])
+
     df_4 = df_4.sort_index()
     df_4 = df_4.replace('null', None)
     df_4 = df_4[
@@ -84,26 +108,22 @@ def  region_4(results_querry_region_4, index_df_1):
 
 def region_6(result_querry_region6):
     df_6_begin = pd.DataFrame(result_querry_region6,
-                              columns=['Project', 'CADICS ID', 'gr', 'Comment_column', 'Value'])
-    df_6_version2 = df_6_begin[['CADICS ID', 'gr', 'Comment_column', 'Value']]
-    df_6 = df_6_version2.pivot(index=['CADICS ID', 'gr'], columns='Comment_column', values='Value')
+                              columns=['Project', 'CADICS ID', 'device_name', 'gr', 'Comment_column', 'Value'])
+    df_6_version2 = df_6_begin[['CADICS ID', 'device_name', 'gr', 'Comment_column', 'Value']]
+    df_6 = df_6_version2.pivot(index=['CADICS ID', 'device_name', 'gr'], columns='Comment_column', values='Value')
     df_6.reset_index(inplace=True)
     return df_6
 
 
 def region_7(results_querry_region_7, index_df_4):
     df_7_pull_sql = pd.DataFrame(results_querry_region_7, columns=['Project', 'Config', 'Lot', 'OptionCode', 'value'])
-    # print('df_7_pull_sql: ', df_7_pull_sql)
     df_7_pull_sql.replace('', None, inplace=True)
-
     df_lot_optioncode = df_7_pull_sql.pivot(index='Lot', columns='Config', values='value')
     df_lot_optioncode.reset_index(inplace=True)
     df_lot_optioncode.index = df_lot_optioncode.index + 1
     df_temp_1 = df_7_pull_sql[['Config', 'OptionCode', 'Lot']]
-    # print('df_temp_1: ', df_temp_1)
     df_temp_2 = df_temp_1.pivot(index='Lot', columns='Config', values='OptionCode')
     df_temp_2.reset_index(inplace=True)
-    # print('df_temp_2: ',df_temp_2)
     df_row_optioncode_name = df_temp_2.iloc[[0]]
     df_row_optioncode_name.at[0, 'Lot'] = 'OptionCode'
     df_7 = pd.concat([df_row_optioncode_name, df_lot_optioncode], axis=0)
@@ -115,14 +135,14 @@ def region_7(results_querry_region_7, index_df_4):
 
 def region_8(result_querry_region8):
     df_8_version1 = pd.DataFrame(result_querry_region8,
-                                 columns=['Project', 'Config', 'CADICS ID', 'gr', 'Value'])
-    df_8_version2 = df_8_version1[['Config', 'gr', 'CADICS ID', 'Value']]
-    df_8 = df_8_version2.pivot(index=['gr', 'CADICS ID'], columns='Config', values='Value')
+                                 columns=['Project', 'Config', 'device_name', 'CADICS ID', 'gr', 'Value'])
+    df_8_version2 = df_8_version1[['Config', 'gr', 'CADICS ID', 'device_name', 'Value']]
+    df_8 = df_8_version2.pivot(index=['gr', 'CADICS ID', 'device_name'], columns='Config', values='Value')
     df_8.reset_index(inplace=True)
     return df_8
 
 
-if __name__ == '__main__':
-    a = []
-    df = region_2(a)
-    print(df)
+# if __name__ == '__main__':
+#     a = []
+#     df = region_2(a)
+#     print(df)

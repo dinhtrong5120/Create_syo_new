@@ -8,10 +8,8 @@ warnings.filterwarnings("ignore")
 
 
 def find_color_cell(file_path_, sheet_name, column_number):
-    # Load workbook
     wb = load_workbook(file_path_)
     sheet = wb[sheet_name]
-
     gray_cells = []
     blue_cells = []
     delete_cells = []
@@ -59,13 +57,8 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
     else:
         df = file_path.copy()
         flg_create_syo = True
-    print('df.shape[1]: ', df.shape[1])
     if df.shape[1] == 6:
-
-        # opt_index = df.shape[0] + 1
-        # streamlit.write('opt_index: ', opt_index)
         opt_index = df.index[df['CADICS ID'] == 'OptionCode'].values[0]
-        # streamlit.write('opt_index_: ', opt_index_)
         gray_cells_list, blue_cells_list_old, delete_cells = find_color_cell(file_path, sheet_name, column_number)
         blue_cells_list_old = [('UNKNOW_device', 0)] + blue_cells_list_old + [('xxx', opt_index)]
         gray_cells_list = [('UNKNOW_device_group', 0)] + gray_cells_list + [('xxx', blue_cells_list_old[-1][1] - 1)]
@@ -139,7 +132,6 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
                     blue_cells_list.append(item)
 
         list_columns_name = []
-        print('df.columns: ', df.columns)
         if 'group_key_map' in df.columns:
             for i, item in enumerate(reversed(df.columns.values)):
                 if str(item).startswith('conf-'):
@@ -153,19 +145,14 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
                     column_names = ['comment_' + str(i + 1) for i in range(0, i)]
                     list_columns_name = list(df.columns.values[:len(df.columns.values) - i]) + column_names
                     break
-        print('list_columns_name: ', list_columns_name)
         df.columns = list_columns_name
         index_gray_old = 0
         value_gray_old = 'xxx'
 
         gray_cells_list = list(set(gray_cells_list))
         gray_cells_list = sorted(gray_cells_list, key=lambda x: x[1])
-        # print('gray_cells_list: ',gray_cells_list)
-        # print('*************************************************')
         blue_cells_list = list(set(blue_cells_list))
         blue_cells_list = sorted(blue_cells_list, key=lambda x: x[1])
-        # print('blue_cells_list: ',blue_cells_list)
-        # print('*************************************************')
         for item in gray_cells_list:
             if item[0] == 'UNKNOW_device_group':
                 value_gray_old = item[0]
@@ -191,10 +178,8 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
             df_cleaned = df_end.dropna(subset=['gr', 'CADICS ID', 'auto'], how='all')
         else:
             df_cleaned = df_end.dropna(subset=['Gr', 'CADICS ID', 'auto'], how='all')
-        # print(delete_cells)
         df_cleaned.drop(index=delete_cells, inplace=True)
         df_cleaned['CADICS ID'] = df_cleaned['CADICS ID'].apply(str.upper)
-        # streamlit.write('df_cleaned: ',df_cleaned)
         return df_cleaned, df_optioncode
 
 
@@ -209,7 +194,6 @@ def config_table(df_):
 
 # 3.---------------------table lot---------------------------------------
 def lot_table(df_1_):
-    print('212  df_1_: ', df_1_)
     lot_table_ref = pd.DataFrame({'lot_name': df_1_.iloc[1:, df_1_.columns.get_loc('CADICS ID')]})
     lot_table_ref.reset_index(drop=True, inplace=True)
     return lot_table_ref
@@ -245,7 +229,7 @@ def device_detail_table(df_):
         if 'default' not in df_.columns:
             device_detail_df = df_[['device_name', 'CADICS ID', 'gr', 'keyword', 'auto']]
         else:
-            print(df_.columns)
+            # print(df_.columns)
             device_detail_df = df_[['device_name', 'CADICS ID', 'gr', 'keyword', 'auto', 'group_key_map', 'default']]
         device_detail_df.rename(
             columns={'CADICS ID': 'device_details_name', 'gr': "group_detail", 'keyword': 'option_detail',
@@ -323,20 +307,24 @@ def status_lot_config_table(df_1_, project_name_):
 # 12.---------------------------------table project_device_comment--------------------
 def project_device_comment_table(df_, project_name_):
     comment_columns = [col for col in df_.columns if col.startswith('comment')]
-    all_columns = ['CADICS ID'] + comment_columns
-    list_col_to_index = []
-    for item in all_columns:
-        list_col_to_index.append(df_.columns.get_loc(item))
-    project_device_comment_ref = df_.iloc[1:, list_col_to_index]
-    project_device_comment_df = pd.melt(project_device_comment_ref, id_vars=['CADICS ID'], value_vars=comment_columns,
-                                        var_name='Comment', value_name='Value')
-    project_device_comment_df.loc[:, 'project_name'] = project_name_
-    project_device_comment_df.rename(
-        columns={'CADICS ID': 'device_details_name', 'Comment': "comment_name", 'Value': 'comment_detail'},
-        inplace=True)
-    project_device_comment_df.dropna(subset=['device_details_name'], inplace=True)
-    project_device_comment_df = project_device_comment_df[project_device_comment_df['device_details_name'] != '']
-    return project_device_comment_df
+    if len(comment_columns) > 0:
+        all_columns = ['CADICS ID'] + comment_columns
+        list_col_to_index = []
+        for item in all_columns:
+            list_col_to_index.append(df_.columns.get_loc(item))
+        project_device_comment_ref = df_.iloc[1:, list_col_to_index]
+        project_device_comment_df = pd.melt(project_device_comment_ref, id_vars=['CADICS ID'],
+                                            value_vars=comment_columns,
+                                            var_name='Comment', value_name='Value')
+        project_device_comment_df.loc[:, 'project_name'] = project_name_
+        project_device_comment_df.rename(
+            columns={'CADICS ID': 'device_details_name', 'Comment': "comment_name", 'Value': 'comment_detail'},
+            inplace=True)
+        project_device_comment_df.dropna(subset=['device_details_name'], inplace=True)
+        project_device_comment_df = project_device_comment_df[project_device_comment_df['device_details_name'] != '']
+        return project_device_comment_df
+    else:
+        return pd.DataFrame()
 
 
 # 13.-------------------------table status_config_device_detail------------------------------
@@ -358,15 +346,3 @@ def status_config_device_detail_table(df_, project_name_):
     status_config_device_detail_df = status_config_device_detail_df[
         status_config_device_detail_df['device_details_name'] != '']
     return status_config_device_detail_df
-
-
-if __name__ == "__main__":
-    # file_path = r"C:\Users\KNT21617\Downloads\input file\仕様表\仕様表_CAR 1.xlsx"
-    file_path = r"C:\Users\KNT21617\Downloads\output file\仕様表_FORM (2).xlsx"
-    project_name = 'CAR 1'
-    df, df_1 = dataframe_convert(file_path, project_name, [], [])
-    # print("df: ", df, '\n')
-    # # df.to_excel('dffffff.xlsx')
-    print(df)
-    df_re = device_detail_table(df)
-    print(df_re.columns)

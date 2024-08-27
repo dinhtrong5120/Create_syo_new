@@ -600,6 +600,8 @@ def query_data(project_name, market, powertrain, develop_case, group, lot):
 
         if header_df is not None:
             session.close()
+            if 'message_1' in st.session_state:
+                del st.session_state['message_1']
             return session, result_df_matched, id_project, id_app_list
     else:
         session.close()

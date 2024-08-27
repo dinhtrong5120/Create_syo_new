@@ -3,6 +3,7 @@ import streamlit
 from openpyxl import load_workbook
 from src.app.check_filed_information import check_syo
 import warnings
+from src.app.list_arrange import check_list_sap_xep
 
 warnings.filterwarnings("ignore")
 
@@ -12,6 +13,7 @@ def find_color_cell(file_path_, sheet_name, column_number):
     sheet = wb[sheet_name]
     gray_cells = []
     blue_cells = []
+    blue_check = []
     delete_cells = []
 
     # Loop through rows
@@ -25,7 +27,12 @@ def find_color_cell(file_path_, sheet_name, column_number):
                 delete_cells.append(cell.row - 2)
             elif cell.fill and cell.fill.start_color.index[2:] == '245269' and cell.value is not None:
                 blue_cells.append((cell.value, cell.row - 2))
+                blue_check.append(cell.value)
                 delete_cells.append(cell.row - 2)
+    blue_check.insert(0, 'UNKNOW_device')
+    # print('blue_check: ', blue_check)
+    check_list_sap_xep('./src/db/your_file.txt', blue_check)
+    # print('ok')
     return gray_cells, blue_cells, delete_cells
 
 
@@ -50,7 +57,8 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
             if len(list_error) > 0 and len(duplicated_elements) == 0:
                 return f'{project_name}: Form SYO incorrect ', list_error
             elif len(list_error) == 0 and len(duplicated_elements) > 0:
-                return f'{project_name}: CADICS ID duplicated ', duplicated_elements
+                streamlit.warning(f'{project_name}: CADICS ID duplicated f{duplicated_elements}')
+                # return f'{project_name}: CADICS ID duplicated ', duplicated_elements
             elif len(list_error) > 0 and len(duplicated_elements) > 0:
                 return f'{project_name}: Form SYO incorrect and CADICS ID duplicated ', [
                     list_error + duplicated_elements]
@@ -61,6 +69,8 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
         opt_index = df.index[df['CADICS ID'] == 'OptionCode'].values[0]
         gray_cells_list, blue_cells_list_old, delete_cells = find_color_cell(file_path, sheet_name, column_number)
         blue_cells_list_old = [('UNKNOW_device', 0)] + blue_cells_list_old + [('xxx', opt_index)]
+        # check_list_sap_xep('../src/db/your_file.txt', blue_cells_list_old)
+
         gray_cells_list = [('UNKNOW_device_group', 0)] + gray_cells_list + [('xxx', blue_cells_list_old[-1][1] - 1)]
 
         index_gray_old = 0
@@ -308,14 +318,16 @@ def status_lot_config_table(df_1_, project_name_):
 def project_device_comment_table(df_, project_name_):
     comment_columns = [col for col in df_.columns if col.startswith('comment')]
     if len(comment_columns) > 0:
-        all_columns = ['CADICS ID'] + comment_columns
+        all_columns = ['device_name', 'CADICS ID'] + comment_columns
         list_col_to_index = []
         for item in all_columns:
             list_col_to_index.append(df_.columns.get_loc(item))
         project_device_comment_ref = df_.iloc[1:, list_col_to_index]
-        project_device_comment_df = pd.melt(project_device_comment_ref, id_vars=['CADICS ID'],
+        print('project_device_comment_ref columns: ', project_device_comment_ref.columns)
+        project_device_comment_df = pd.melt(project_device_comment_ref, id_vars=['device_name', 'CADICS ID'],
                                             value_vars=comment_columns,
                                             var_name='Comment', value_name='Value')
+        print('project_device_comment_df columns: ', project_device_comment_df.columns)
         project_device_comment_df.loc[:, 'project_name'] = project_name_
         project_device_comment_df.rename(
             columns={'CADICS ID': 'device_details_name', 'Comment': "comment_name", 'Value': 'comment_detail'},
@@ -330,12 +342,12 @@ def project_device_comment_table(df_, project_name_):
 # 13.-------------------------table status_config_device_detail------------------------------
 def status_config_device_detail_table(df_, project_name_):
     config_columns = [col for col in df_.columns if col.startswith('conf-')]
-    all_columns = ['CADICS ID'] + config_columns
+    all_columns = ['device_name', 'CADICS ID'] + config_columns
     list_col_to_index = []
     for item in all_columns:
         list_col_to_index.append(df_.columns.get_loc(item))
     status_config_device_detail_ref = df_.iloc[:, list_col_to_index]
-    status_config_device_detail_df = pd.melt(status_config_device_detail_ref, id_vars=['CADICS ID'],
+    status_config_device_detail_df = pd.melt(status_config_device_detail_ref, id_vars=['device_name', 'CADICS ID'],
                                              value_vars=config_columns,
                                              var_name='Config', value_name='Value')
     status_config_device_detail_df.loc[:, 'project_name'] = project_name_

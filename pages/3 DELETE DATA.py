@@ -20,7 +20,7 @@ if 'position' in st.session_state:
         st.write("")
 
         st.markdown(
-            '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">INPUT</h1>',
+            '<h1 style="text-align: center;border: 2px solid #4CAF50; padding: 10px;">INPUT</h1>',
             unsafe_allow_html=True)
     # st.subheader("")
         st.write("")
@@ -46,7 +46,7 @@ if 'position' in st.session_state:
             except:
                 st.warning("Input is empty!")
         st.markdown(
-            '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">OUTPUT</h1>',
+            '<h1 style="text-align: center;border: 2px solid #4CAF50; padding: 10px;">OUTPUT</h1>',
             unsafe_allow_html=True)
         st.write("")
         col3, col4 = st.columns(2)

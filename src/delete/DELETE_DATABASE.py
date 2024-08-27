@@ -36,7 +36,7 @@ def delete_database():
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(
-            '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">仕様表</h1>',
+            '<h1 style="text-align: center;border: 2px solid #4CAF50; padding: 10px;">仕様表</h1>',
             unsafe_allow_html=True)
         st.subheader("")
         all_project = querry_to_show_project()
@@ -51,7 +51,7 @@ def delete_database():
 
     with col2:
         st.markdown(
-            '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">プロ管</h1>',
+            '<h1 style="text-align: center;border: 2px solid #4CAF50; padding: 10px;">プロ管</h1>',
             unsafe_allow_html=True)
         st.subheader("")
         all_project = querry_to_show_project_prokan()

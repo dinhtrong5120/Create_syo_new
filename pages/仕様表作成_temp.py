@@ -14,7 +14,7 @@ def reset_data():
         st.session_state['data'] = {}
 
 
-if 1 == 1:
+if 1 == 2:
     try:
         if st.session_state.position == "admin" or st.session_state.position == "master":
             admin_syo_hyo()

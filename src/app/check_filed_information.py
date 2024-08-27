@@ -6,7 +6,10 @@ import re
 import os
 import math
 import unicodedata
+import warnings
+import time
 
+warnings.filterwarnings("ignore")
 
 def read_protected_excel(file_path_, sheet_name_):
     # Extract the password from the file name
@@ -89,7 +92,7 @@ def check_key_spec_new(file_name):
         dict_sub['SHEET_NAME'] = '✕'
         flg_check_fail = True
         df = pd.DataFrame([dict_sub])
-        streamlit.write(df)
+        # streamlit.write(df)
         return df, flg_check_fail
 
     list_key_word_1 = df.iloc[14].tolist()
@@ -128,6 +131,7 @@ def normalize_japanese_text(input_text):
 
 
 def check_syo(df_):
+
     list_error = []
     for item in ['auto', 'Gr', 'Keyword', 'CADICS ID']:
         if item not in df_.columns:
@@ -146,8 +150,22 @@ def check_syo(df_):
     valid_df = df_[df_['CADICS ID'].notna() & (df_['CADICS ID'] != '')]
     valid_df['CADICS ID'] = valid_df['CADICS ID'].apply(str.upper)
     duplicated_elements_ = valid_df[valid_df.duplicated('CADICS ID', keep=False)]['CADICS ID'].unique().tolist()
-    print('list_error: ', list_error)
-    print('duplicated_elements_: ', duplicated_elements_)
+    # if len(duplicated_elements_)>0:
+    #     # Tạo một từ điển để theo dõi số lần xuất hiện
+    #     counts = {}
+    #
+    #     # Hàm để thêm hậu tố cho các giá trị trùng lặp
+    #     def add_suffix(cadics_id):
+    #         if cadics_id in counts:
+    #             counts[cadics_id] += 1
+    #             return f"{cadics_id}_{counts[cadics_id]}"
+    #         else:
+    #             counts[cadics_id] = 0  # Đặt giá trị ban đầu là 0 (lần đầu tiên không có hậu tố)
+    #             return cadics_id  # Trả về giá trị gốc cho lần xuất hiện đầu tiên
+    #
+    #     # Áp dụng hàm cho cột 'CADICS ID'
+    #     valid_df['CADICS ID'] = valid_df['CADICS ID'].apply(add_suffix)
+    # valid_df.to_excel('valid_df.xlsx')
     return list_error, duplicated_elements_
 
 
@@ -162,9 +180,8 @@ def check_optioncode(df_):
         else:
             return False
 
-#
-# if __name__ == "__main__":
-#     df = pd.read_excel(r"C:\Users\KNT21617\Downloads\newken\project\data\input_syo\CAR 1.xlsx")
-#     print(df['CADICS ID'])
-#     list_error, duplicated_elements = check_syo(df)
-#     print(list_error, duplicated_elements)
+
+if __name__ == "__main__":
+    df = pd.read_excel(r"C:\Users\KNT21617\Downloads\input file\仕様表\仕様表_CAR 1 - Copy.xlsx")
+    list_error, duplicated_elements = check_syo(df)
+    print(list_error, duplicated_elements)

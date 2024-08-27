@@ -292,7 +292,7 @@ def querry_data_syo_hyo(project_name):
         df_8 = region_8(results_querry_region_8)
         # streamlit.write('DF_4: ',df_4)
         # streamlit.write('DF_8: ',df_8)
-        merged_df_4_8 = pd.merge(df_4, df_8, on=['gr', 'CADICS ID','device_name'], how='left')
+        merged_df_4_8 = pd.merge(df_4, df_8, on=['gr', 'CADICS ID', 'device_name'], how='left')
         # st.write('merged_df_4_8: ',merged_df_4_8)
         try:
             merged_df_4_8.set_index(df_4.index, inplace=True)
@@ -311,7 +311,7 @@ def querry_data_syo_hyo(project_name):
                       ).join(CommentColumn, CommentColumn.comment_id == ProjectDeviceComment.comment_id
                              ).filter(Project.project_name == project_name).all()
         df_6 = region_6(results_querry_region_6)
-        merged_df_1_2_4_6_7_8 = pd.merge(merged_df_1_2_4_7_8, df_6, on=['gr', 'CADICS ID','device_name'], how='left')
+        merged_df_1_2_4_6_7_8 = pd.merge(merged_df_1_2_4_7_8, df_6, on=['gr', 'CADICS ID', 'device_name'], how='left')
         merged_df_1_2_4_6_7_8 = merged_df_1_2_4_6_7_8.fillna("")
         merged_df_1_2_4_6_7_8 = merged_df_1_2_4_6_7_8.drop(columns=['device_name'])
         session.close()
@@ -393,7 +393,18 @@ def update_data_new(project_name, df, df_1):
     df_ref = df.copy()
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     df_1 = df_1.applymap(lambda x: x.strip() if isinstance(x, str) else x)
-    df = df.drop_duplicates(subset=['CADICS ID'], keep='first')
+    # df = df.drop_duplicates(subset=['CADICS ID', 'device_name'], keep='first')
+    #*******************************************
+    # Tạo một cột mới để đánh dấu các bản ghi trùng lặp
+    df['duplicate_count'] = df.groupby(['CADICS ID', 'device_name']).cumcount()
+
+    # Thêm hậu tố cho các bản ghi trùng lặp
+    df['CADICS ID'] = df.apply(
+        lambda x: f"{x['CADICS ID']}_{x['duplicate_count']}" if x['duplicate_count'] > 0 else x['CADICS ID'], axis=1)
+
+    # Xóa cột duplicate_count
+    df = df.drop(columns=['duplicate_count'])
+    #*******************************************
     list_error = []
     project_name = str(project_name).upper()
     engine = connect_db()
@@ -532,8 +543,8 @@ def update_data_new(project_name, df, df_1):
                             update(DeviceDetails).
                             where(DeviceDetails.device_details_name == row['device_details_name']).
                             values(
-                                   # device_name=row['device_name'],
-                                   auto_detail=row['auto_detail'])
+                                # device_name=row['device_name'],
+                                auto_detail=row['auto_detail'])
                         )
                         session.execute(stmt)
 
@@ -673,7 +684,7 @@ def update_data_new(project_name, df, df_1):
                     session.rollback()
         if list_delete_device_name_device_detail_name:
             for item in list_delete_device_name_device_detail_name:
-                print(item)
+                # print(item)
                 session.query(DeviceDetails).filter(DeviceDetails.device_name == item[0],
                                                     DeviceDetails.device_details_name == item[1]).delete()
 
@@ -873,11 +884,13 @@ def update_data_new(project_name, df, df_1):
                                                       columns=['comment_id', 'comment_name'])
 
         querry_device_details_in_DB = session.query(DeviceDetails.device_details_id,
-                                                    DeviceDetails.device_details_name).all()
-        device_details_data_after_querry = [(device_details.device_details_id, device_details.device_details_name) for
-                                            device_details in querry_device_details_in_DB]
+                                                    DeviceDetails.device_details_name, DeviceDetails.device_name).all()
+        device_details_data_after_querry = [
+            (device_details.device_details_id, device_details.device_details_name, device_details.device_name) for
+            device_details in querry_device_details_in_DB]
         device_details_table_df_querry = pd.DataFrame(device_details_data_after_querry,
-                                                      columns=['device_details_id', 'device_details_name'])
+                                                      columns=['device_details_id', 'device_details_name',
+                                                               'device_name'])
 
         # 8.-------------------table optioncode--------------------------------------
         list_existing_optioncode = (
@@ -1077,7 +1090,7 @@ def update_data_new(project_name, df, df_1):
         list_existing_project_device_comment = (
             session.query(ProjectDeviceComment.comment_detail, ProjectDeviceComment.project_id,
                           ProjectDeviceComment.comment_id, ProjectDeviceComment.device_details_id).all())
-
+        # st.write('list_existing_project_device_comment: ', list_existing_project_device_comment)
         project_device_comment = project_device_comment_table(df.loc[11:, ], project_name)
         if not project_device_comment.empty:
             project_device_comment_table_df_merge_prj = pd.merge(project_device_comment, project_table_df_querry,
@@ -1087,7 +1100,8 @@ def update_data_new(project_name, df, df_1):
                                                                  comment_column_table_df_querry, on='comment_name',
                                                                  how='left')
             project_device_comment_table_df_temp = pd.merge(project_device_comment_table_df_merge_cmt,
-                                                            device_details_table_df_querry, on='device_details_name',
+                                                            device_details_table_df_querry,
+                                                            on=['device_details_name', 'device_name'],
                                                             how='left')
             project_device_comment_table_df_temp.drop(columns=['project_name', 'comment_name', 'device_details_name'],
                                                       inplace=True)
@@ -1099,17 +1113,21 @@ def update_data_new(project_name, df, df_1):
             set_list_existing_project_device_comment = set(list_existing_project_device_comment)
             list_check_project_device_comment = list(
                 set([(tup[1], tup[2], tup[3]) for tup in set_list_existing_project_device_comment]))
+            # st.write("list_check_project_device_comment: ", list_check_project_device_comment)
             list_only_in_list_project_device_comment_table_df_insert = [item for item in
                                                                         list_project_device_comment_table_df if
                                                                         item not in set_list_existing_project_device_comment and (
                                                                             item[1], item[2],
                                                                             item[
                                                                                 3]) not in list_check_project_device_comment]
+            # st.write('list_only_in_list_project_device_comment_table_df_insert: ',
+            #          list_only_in_list_project_device_comment_table_df_insert)
             list_only_in_list_project_device_comment_table_df_update = [item for item in
                                                                         list_project_device_comment_table_df if
                                                                         item not in set_list_existing_project_device_comment and (
                                                                             item[1], item[2],
-                                                                            item[3]) in list_check_project_device_comment]
+                                                                            item[
+                                                                                3]) in list_check_project_device_comment]
             if list_only_in_list_project_device_comment_table_df_update:
                 project_device_comment_table_df = pd.DataFrame(list_only_in_list_project_device_comment_table_df_update,
                                                                columns=project_device_comment_table_df_temp.columns)
@@ -1139,10 +1157,12 @@ def update_data_new(project_name, df, df_1):
                         new_querry_project_device_comment_table_table = ProjectDeviceComment(
                             device_details_id=row['device_details_id'], comment_id=row['comment_id'],
                             comment_detail=row['comment_detail'], project_id=row['project_id'])
-                        session.add(new_querry_project_device_comment_table_table)
+                    #         session.add(new_querry_project_device_comment_table_table)
+                    #         session.commit()
                     except Exception as e:
                         print(e)
-                        session.rollback()
+                        # print('row: ',row)
+                        # session.rollback()
         # 13.-------------------------table status_config_device_detail------------------------------
 
         list_existing_status_config_device_detail = (
@@ -1157,7 +1177,8 @@ def update_data_new(project_name, df, df_1):
                                                                      on='config_name',
                                                                      how='left')
         status_config_device_detail_table_df_temp = pd.merge(status_config_device_detail_table_df_merge_config,
-                                                             device_details_table_df_querry, on='device_details_name',
+                                                             device_details_table_df_querry,
+                                                             on=['device_details_name', 'device_name'],
                                                              how='left')
         status_config_device_detail_table_df_temp.drop(columns=['project_name', 'config_name', 'device_details_name'],
                                                        inplace=True)

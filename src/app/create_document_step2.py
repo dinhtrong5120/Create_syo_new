@@ -14,6 +14,7 @@ from src.app.create_manage_part import create_manage_part
 from src.db.funtion_database import query_data
 from src.ux_ui.read_data_view import zip_folder
 import streamlit as st
+from src.db.function_database_new import querry_data_syo_hyo
 #dic_test={ "XQ2":[1,"【サンプル】XXQ2関連表1_B(車体音振).xlsx","【サンプル】XXQ2関連表2_B(車体音振).xlsx","【サンプル】XXQ2関連表3_B(車体音振) .xlsx","【サンプル】XXQ2関連表4_B(車体音振) .xlsx",4,"【サンプル】仕様表_L21C.xlsx"],"XQ4":[1,"【サンプル】XXQ4関連表1_B(車体音振).xlsx","【サンプル】XXQ4関連表2_B(車体音振).xlsx","【サンプル】XXQ4関連表3_B(車体音振).xlsx","【サンプル】XXQ4関連表4_B(車体音振).xlsx",4,"【サンプル】仕様表_L21C.xlsx"]}
 
 def create_doc(case,plant,powertrain,car):
@@ -30,9 +31,9 @@ def create_doc(case,plant,powertrain,car):
     link_spec,dict_group_karenhyo3,dict_group_karenhyo4=get_group_karenhyo34(folder_data,car)
     if data_return[0]==None:
         return "Data cadics not exist in database!"
-    if link_spec==None:
-        return "File Specification not exist!"
-    if link_spec==None or len(dict_group_karenhyo3)==0 and len(dict_group_karenhyo4)==0:
+    # if link_spec==None:
+    #     return "File Specification not exist!"
+    if len(dict_group_karenhyo3)==0 and len(dict_group_karenhyo4)==0:
         return "Lack of 関連表③, 関連表④"
 #==========================Du lieu tong=====================================
     cadics_all=data_return[1]
@@ -47,7 +48,14 @@ def create_doc(case,plant,powertrain,car):
 #==========================set link output==================================
     name_file_zip=folder_out+".zip"
 #===================process logic to write Output===========================
-    data_spec = pd.read_excel(link_spec, sheet_name="Sheet1",header=None)          # notice: sheet_name
+    merge_end, unique_list_max, unique_list_submax = querry_data_syo_hyo(car)
+    merge_end = merge_end.drop(columns=['group_key_map', 'default'])
+    new_data = [merge_end.columns] + merge_end.values.tolist()  # Kết hợp tên cột với dữ liệu
+    new_df = pd.DataFrame(new_data)
+    new_df = new_df.replace('', None)
+    # data_spec = pd.read_excel(file_spec, sheet_name="Sheet1", header=None)
+    data_spec = new_df.copy()
+    # data_spec = pd.read_excel(link_spec, sheet_name="Sheet1",header=None)          # notice: sheet_name
     data_spec=data_spec.map(lambda x: normalize_japanese_text(x).lower() if isinstance(x, str) else x)
     frame_data_car,car_number,dict_config=get_car_infor(data_spec)
     #st.write(car_number)

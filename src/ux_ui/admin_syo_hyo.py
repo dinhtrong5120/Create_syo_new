@@ -237,14 +237,14 @@ def admin_syo_hyo():
         with col_r1:
             st.markdown(
                 '<h1 style="text-align: center;'
-                'background-color: #CCE9D9;'
+                # 'background-color: #CCE9D9;'
                 'border: 2px solid #4CAF50; '
                 'padding: 10px;">仕様表自動作成</h1>',
                 unsafe_allow_html=True)
         with col_r2:
             st.markdown(
                 f'<p style="text-align: center;'
-                f'background-color: #CCE9D9;'
+                # f'background-color: #CCE9D9;'
                 f'border: 2px solid #4CAF50; '
                 f'padding: 10px">{st.session_state.name_user}<br>{st.session_state.position}</p>',
                 unsafe_allow_html=True)

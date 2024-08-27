@@ -94,8 +94,8 @@ def process_dataframe(df_):
     else:
         def update_conf_values(row):
             if row['default'] not in [None, np.nan, '', np.NaN]:
-                print(row['default'])
-                print('okkkk')
+                # print(row['default'])
+                # print('okkkk')
                 for col in df_.columns:
                     if str(col).startswith('conf-'):
                         df_.at[row.name, col] = row['default']

@@ -3,6 +3,7 @@ import warnings
 import pandas as pd
 import streamlit
 from openpyxl import load_workbook
+from src.app.list_arrange import check_list_sap_xep
 
 warnings.filterwarnings("ignore")
 
@@ -11,6 +12,7 @@ def find_color_cell(sheet_, column_numbers_):
     gray_cells = []
     blue_cells = []
     delete_cells = []
+    blue_check = []
     for column_number in column_numbers_:
 
         for row_idx in range(1, sheet_.max_row + 1):
@@ -22,9 +24,12 @@ def find_color_cell(sheet_, column_numbers_):
                     delete_cells.append(cell.row)
                 elif cell.fill and cell.fill.start_color.index[2:] == '245269' and cell.value is not None:
                     blue_cells.append((cell.value, cell.row))
+                    blue_check.append(cell.value)
                     delete_cells.append(cell.row)
                 elif cell.fill and cell.fill.start_color.index[2:] == '969696' and cell.row > 9:
                     delete_cells.append(cell.row)
+    blue_check.insert(0, 'UNKNOW_device')
+    check_list_sap_xep('./src/db/your_file.txt', blue_check)
     return gray_cells, blue_cells, delete_cells
 
 

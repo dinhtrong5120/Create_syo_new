@@ -149,6 +149,7 @@ def admin_all_1():
                     st.session_state.create_form_complete = False
                     st.session_state.create_syo_complete = False
                     st.session_state.create_output_complete = False
+
                     modal_create_cadics.open()
 
                 if col_left_spec_grid.form_submit_button("CREATE OUTPUTS", use_container_width=True) and get_data(
@@ -181,6 +182,8 @@ def admin_all_1():
                             st.session_state.message_5 = "file has not been uploaded yet!!!"
                             if 'message_4' in st.session_state:
                                 del st.session_state['message_4']
+                            if 'message_10' in st.session_state:
+                                del st.session_state['message_10']
                         st.session_state.load_complete = True
                         modal_load_file.close()
             if modal_view.is_open():
@@ -257,16 +260,19 @@ def admin_all_1():
                             st.session_state.message_6 = "file has not been uploaded yet"
                         set_data("running", 0)
                         st.session_state.create_form_complete = True
-                        # modal_create_form.close()
+                        modal_create_form.close()
 
             if modal_create_syo.is_open():
+
                 with modal_create_syo.container():
                     with st.spinner(text="In progress..."):
                         if not get_data("flag_check_fail") and get_data(
                                 "flag_check_fail") is not None and 'data_frame_combine' in st.session_state:
                             if st.session_state.data_frame_combine.shape[1] > 4:
                                 check_optioncode(st.session_state.data_frame_combine)
+
                                 if not check_optioncode(st.session_state.data_frame_combine):
+                                    # st.write('ok')
                                     if st.session_state.code != '':
                                         form_syo = create_syo(st.session_state.data_frame_combine,
                                                           get_data("data_for_create"))
@@ -290,7 +296,12 @@ def admin_all_1():
                                     else:
                                         st.warning("Model code can not be left blank")
                                         st.session_state.message_7 = 'Model code can not be left blank'
+                                else:
+                                    # st.write('OptionCode empty')
+                                    st.session_state.message_7 = 'OptionCode empty'
+                                    time.sleep(1.5)
                             else:
+                                # st.write('ok')
                                 st.warning("OptionCode empty")
                                 st.session_state.message_7 = 'OptionCode empty'
                         else:
@@ -300,7 +311,7 @@ def admin_all_1():
                             st.warning(st.session_state.message_7)
                         set_data("running", 0)
                         st.session_state.create_syo_complete = True
-                        # modal_create_syo.close()
+                        modal_create_syo.close()
 
             if modal_create_cadics.is_open():
                 with modal_create_cadics.container():
@@ -320,7 +331,7 @@ def admin_all_1():
                         st.write("notice: ", notice)
                         st.session_state.message_8 = notice
                         st.session_state.create_cadics_complete = True
-                        modal_create_cadics.close()
+                        # modal_create_cadics.close()
             if modal_create_output.is_open():
                 with modal_create_output.container():
                     with st.spinner(text="In progress..."):
@@ -352,6 +363,8 @@ def admin_all_1():
                 if 'message_4' in st.session_state:
                     if 'Update' in st.session_state.message_4:
                         st.success(st.session_state.message_4)
+                        if 'message_10' in st.session_state:
+                            del st.session_state['message_10']
                     elif st.session_state.message_4 != '':
                         st.error(st.session_state.message_4)
                 if 'message_5' in st.session_state:
@@ -359,6 +372,12 @@ def admin_all_1():
                         st.success(st.session_state.message_5)
                     elif st.session_state.message_5 != '':
                         st.error(st.session_state.message_5)
+                if 'message_10' in st.session_state:
+                    if 'Updated' in st.session_state.message_10:
+                        st.success(st.session_state.message_10)
+                    else:
+                        st.error(st.session_state.message_10)
+
             # ******************************************************
             if st.session_state.create_form_complete:
                 if 'Completed!!!' in st.session_state.message_6:
@@ -367,10 +386,11 @@ def admin_all_1():
                     st.error(st.session_state.message_6)
             # ******************************************************
             if st.session_state.create_syo_complete:
-                if 'Completed' in st.session_state.message_7:
-                    st.success(st.session_state.message_7)
-                else:
-                    st.error(st.session_state.message_7)
+                if 'message_7' in st.session_state:
+                    if 'Completed' in st.session_state.message_7:
+                        st.success(st.session_state.message_7)
+                    else:
+                        st.error(st.session_state.message_7)
             # ******************************************************
             if st.session_state.create_cadics_complete:
                 if 'Completed' in st.session_state.message_8:
@@ -387,13 +407,13 @@ def admin_all_1():
         except Exception as e:
             print(e)
             st.write(e)
-            st.write('st.session_state.selected_option: ',st.session_state.selected_option)
+            # st.write('st.session_state.selected_option: ',st.session_state.selected_option)
     with col_right:
         # BANNER RIGHT
         col_r1, col_r2 = st.columns([2, 1])
         with col_r1:
             st.markdown(
-                '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">プロ管集約業務1本化システム</h1>',
+                '<h1 style="text-align: center;border: 2px solid #4CAF50; padding: 10px;">プロ管集約業務1本化システム</h1>',
                 unsafe_allow_html=True)
             #    st.markdown(
         # '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">INPUT</h1>',
@@ -403,7 +423,7 @@ def admin_all_1():
             # st.markdown(f'<p style="text-align: center;">{st.session_state.position}</p>', unsafe_allow_html=True)
             st.markdown(
                 f'<p style="text-align: center;'
-                f'background-color: #CCE9D9;'
+                # f'background-color: #CCE9D9;'
                 f'border: 2px solid #4CAF50; '
                 f'padding: 10px">{st.session_state.name_user}<br>{st.session_state.position}</p>',
                 unsafe_allow_html=True)

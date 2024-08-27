@@ -1,4 +1,5 @@
 import pandas as pd
+import ast
 import streamlit
 
 
@@ -38,20 +39,23 @@ def region_4(results_querry_region_4, index_df_1):
     df_4_begin = pd.DataFrame(results_querry_region_4,
                               columns=['device_group', 'device_name', 'auto', 'group_detail', 'option_detail',
                                        'device_details_name', 'group_key_map', 'default'])
-    list_sap_xep = ['UNKNOW_device', 'LIGHTING', 'GLASSES', 'SIDE VIEW MIRROR / CAMERA', 'REAR VIEW MIRROR / CAMERA',
-                    'COMBI METER', 'HMI',
-                    'PHYSICAL SWITCHES', 'STEERING', 'PEDALS AND FOOT-REST', 'GEAR SHIFT', 'PARKING BRAKE',
-                    'WINDOW OPENING', 'SUN VISOR', 'DRIVER SEAT', 'ASSIST SEAT', '2ND ROW SEAT', 'HEADREST', 'TRIM',
-                    '1ST ROW STORAGE', '2ND ROW STORAGE', 'TRUNK / LUGGAGE STORAGE', 'FUNCTIONAL LIGHTING',
-                    'AMBIENT LIGHTING', 'PASSENGER SUPPORT', 'INNER PROTECTION', 'CARPETS',
-                    'TYPE OF INTERIOR DECORATION',
-                    'AMENITY', 'AIR CONDITIONING AND HEATING', 'AIR QUALITY MANAGEMENT', 'AUDIO & NAVIGATION',
-                    'SPEAKERS',
-                    'SOUND BUBBLE', 'NVH MANAGEMENT', 'ACCESS', 'OPENING', 'PROTECTION', 'ACCESSORY', 'LOGO & EMBLEM',
-                    'SUSPENSION', 'BRAKING', 'DRIVING MODE', 'ECO DRIVING AIDS', 'TIRES', 'WHEELS & WHEEL COVERS',
-                    'SPARE WHEEL', 'ADAS COMFORT', 'ADAS SAFETY', 'ADAS PARKING', 'WARNING & ALERT', 'AIRBAGS',
-                    'SEAT BELT',
-                    'OTHER', 'SPECIFICATION', 'CHARGER', 'PLUG / CABLE', 'EV DEDICATED FEATURES']
+    # list_sap_xep = ['UNKNOW_device', 'LIGHTING', 'GLASSES', 'SIDE VIEW MIRROR / CAMERA', 'REAR VIEW MIRROR / CAMERA',
+    #                 'COMBI METER', 'HMI', 'PHYSICAL SWITCHES', 'STEERING', 'PEDALS AND FOOT-REST', 'GEAR SHIFT',
+    #                 'PARKING BRAKE', 'WINDOW OPENING', 'SUN VISOR', 'DRIVER SEAT', 'ASSIST SEAT', '2ND ROW SEAT',
+    #                 'HEADREST', 'TRIM', '1ST ROW STORAGE', '2ND ROW STORAGE', 'TRUNK / LUGGAGE STORAGE',
+    #                 'FUNCTIONAL LIGHTING', 'AMBIENT LIGHTING', 'PASSENGER SUPPORT', 'INNER PROTECTION', 'CARPETS',
+    #                 'TYPE OF INTERIOR DECORATION', 'AMENITY', 'AIR CONDITIONING AND HEATING', 'AIR QUALITY MANAGEMENT',
+    #                 'AUDIO & NAVIGATION', 'SPEAKERS', 'SOUND BUBBLE', 'NVH MANAGEMENT', 'ACCESS', 'OPENING',
+    #                 'PROTECTION', 'ACCESSORY', 'LOGO & EMBLEM',
+    #                 'SUSPENSION', 'BRAKING', 'DRIVING MODE', 'ECO DRIVING AIDS', 'TIRES', 'WHEELS & WHEEL COVERS',
+    #                 'SPARE WHEEL', 'ADAS COMFORT', 'ADAS SAFETY', 'ADAS PARKING', 'WARNING & ALERT', 'AIRBAGS',
+    #                 'SEAT BELT',
+    #                 'OTHER', 'SPECIFICATION', 'CHARGER', 'PLUG / CABLE', 'EV DEDICATED FEATURES']
+    with open('src/db/your_file.txt', 'r') as file:
+        data = file.read()
+
+    # Chuyển đổi chuỗi thành danh sách
+    list_sap_xep = ast.literal_eval(data)
     # Tạo cột ánh xạ thứ tự cho `device_name`
     df_4_begin['device_name_order'] = df_4_begin['device_name'].apply(
         lambda x: list_sap_xep.index(x) if x in list_sap_xep else len(list_sap_xep))
@@ -140,7 +144,6 @@ def region_8(result_querry_region8):
     df_8 = df_8_version2.pivot(index=['gr', 'CADICS ID', 'device_name'], columns='Config', values='Value')
     df_8.reset_index(inplace=True)
     return df_8
-
 
 # if __name__ == '__main__':
 #     a = []

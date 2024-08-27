@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import openpyxl
+import streamlit
 import unicodedata
 import os
 import time
@@ -17,6 +18,9 @@ from src.db.funtion_database import update_new, get_header
 from src.ux_ui.read_data_view import frame_empty
 from src.app.check_option_new_v4 import check_option_new_v4
 from src.app.get_item_edit_1 import get_item
+from src.db.function_database_new import querry_data_syo_hyo
+
+
 def create_cadics_new(case, market, powertrain, car, list_group):
     # working = os.path.dirname(__file__)
     folder_name = str(car).upper() + "_" + powertrain + "_" + market + "_" + case
@@ -24,16 +28,28 @@ def create_cadics_new(case, market, powertrain, car, list_group):
     folder_data = folder_data.replace("\\", "/")
     folder_out_check = os.path.join("./output", folder_name)
     folder_out_check = folder_out_check.replace("\\", "/")
+
     if os.path.exists(folder_out_check) == False:
         os.mkdir(folder_out_check)
 
     file_spec, dic_group_karenhyo12, notice, group_pick = get_group_karenhyo12(folder_data, car, folder_out_check,
                                                                                list_group)
-    if file_spec == None or len(dic_group_karenhyo12) == 0:
+    if len(dic_group_karenhyo12) == 0:
         return "Check input again!!!", None, frame_empty(), None, None
     # ===========================set link output=============================
-    data_spec = pd.read_excel(file_spec, sheet_name="Sheet1", header=None)
+    merge_end, unique_list_max, unique_list_submax = querry_data_syo_hyo(car)
+    # streamlit.write('merge_end: ',merge_end)
+    # streamlit.write('merge_end columns: ',merge_end.columns)
+    # streamlit.write('merge_end columns: ',type(merge_end.columns))
+    merge_end = merge_end.drop(columns=['group_key_map', 'default'])
+    new_data = [merge_end.columns] + merge_end.values.tolist()  # Kết hợp tên cột với dữ liệu
+    new_df = pd.DataFrame(new_data)
+    new_df = new_df.replace('', None)
+    # streamlit.write('new_df: ', new_df)
+    # data_spec = pd.read_excel(file_spec, sheet_name="Sheet1", header=None)
+    data_spec = new_df.copy()
     data_spec = data_spec.applymap(lambda x: normalize_japanese_text(x).lower() if isinstance(x, str) else x)
+    # streamlit.write('data_spec: ', data_spec)
     #body_type = data_spec.iat[3, 4]
     # ========================Create File Output=============================
     adddress_config, frame_header, dict_grade, max_car, body_type = get_infor_car(data_spec)

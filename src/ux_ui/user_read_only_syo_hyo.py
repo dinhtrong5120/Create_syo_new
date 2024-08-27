@@ -44,7 +44,7 @@ def user_read_only_syo_hyo():
                 col_r1, col_r2 = st.columns([2, 1])
                 with col_r1:
                     st.markdown(
-                        '<h1 style="text-align: center;background-color: #CCE9D9;border: 2px solid #4CAF50; padding: 10px;">仕様表自動作成</h1>',
+                        '<h1 style="text-align: center;border: 2px solid #4CAF50; padding: 10px;">仕様表自動作成</h1>',
                         unsafe_allow_html=True)
                 with col_r2:
                     st.markdown(

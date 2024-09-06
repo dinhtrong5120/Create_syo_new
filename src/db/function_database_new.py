@@ -684,7 +684,7 @@ def update_data_new(project_name, df, df_1):
                     session.rollback()
         if list_delete_device_name_device_detail_name:
             for item in list_delete_device_name_device_detail_name:
-                # print(item)
+                print(item)
                 session.query(DeviceDetails).filter(DeviceDetails.device_name == item[0],
                                                     DeviceDetails.device_details_name == item[1]).delete()
 
@@ -1090,7 +1090,7 @@ def update_data_new(project_name, df, df_1):
         list_existing_project_device_comment = (
             session.query(ProjectDeviceComment.comment_detail, ProjectDeviceComment.project_id,
                           ProjectDeviceComment.comment_id, ProjectDeviceComment.device_details_id).all())
-        # st.write('list_existing_project_device_comment: ', list_existing_project_device_comment)
+        st.write('list_existing_project_device_comment: ', list_existing_project_device_comment)
         project_device_comment = project_device_comment_table(df.loc[11:, ], project_name)
         if not project_device_comment.empty:
             project_device_comment_table_df_merge_prj = pd.merge(project_device_comment, project_table_df_querry,
@@ -1113,15 +1113,15 @@ def update_data_new(project_name, df, df_1):
             set_list_existing_project_device_comment = set(list_existing_project_device_comment)
             list_check_project_device_comment = list(
                 set([(tup[1], tup[2], tup[3]) for tup in set_list_existing_project_device_comment]))
-            # st.write("list_check_project_device_comment: ", list_check_project_device_comment)
+            st.write("list_check_project_device_comment: ", list_check_project_device_comment)
             list_only_in_list_project_device_comment_table_df_insert = [item for item in
                                                                         list_project_device_comment_table_df if
                                                                         item not in set_list_existing_project_device_comment and (
                                                                             item[1], item[2],
                                                                             item[
                                                                                 3]) not in list_check_project_device_comment]
-            # st.write('list_only_in_list_project_device_comment_table_df_insert: ',
-            #          list_only_in_list_project_device_comment_table_df_insert)
+            st.write('list_only_in_list_project_device_comment_table_df_insert: ',
+                     list_only_in_list_project_device_comment_table_df_insert)
             list_only_in_list_project_device_comment_table_df_update = [item for item in
                                                                         list_project_device_comment_table_df if
                                                                         item not in set_list_existing_project_device_comment and (
@@ -1157,7 +1157,7 @@ def update_data_new(project_name, df, df_1):
                         new_querry_project_device_comment_table_table = ProjectDeviceComment(
                             device_details_id=row['device_details_id'], comment_id=row['comment_id'],
                             comment_detail=row['comment_detail'], project_id=row['project_id'])
-                    #         session.add(new_querry_project_device_comment_table_table)
+                        session.add(new_querry_project_device_comment_table_table)
                     #         session.commit()
                     except Exception as e:
                         print(e)

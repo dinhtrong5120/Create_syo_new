@@ -66,7 +66,7 @@ def process_dataframe(df_):
             for col in conf_cols:
                 unique_values = group[col].unique()
                 # Lấy giá trị đầu tiên không phải là '-'
-                valid_value = next((val for val in unique_values if val != '-'), None)
+                valid_value = next((val for val in unique_values if val not in ['-', 'w/o']), None)
                 if valid_value:
                     group[col] = valid_value
             return group
@@ -86,7 +86,10 @@ def process_dataframe(df_):
             if row['default'] not in [None, np.nan, '']:
                 for col in final_df.columns:
                     if str(col).startswith('conf-'):
-                        final_df.at[row.name, col] = row['default']
+                        if str(row['default']).upper() == 'XQZ':
+                            final_df.at[row.name, col] = ''
+                        else:
+                            final_df.at[row.name, col] = row['default']
 
         # Áp dụng hàm update_conf_values cho từng hàng
         final_df.apply(update_conf_values, axis=1)
@@ -94,8 +97,8 @@ def process_dataframe(df_):
     else:
         def update_conf_values(row):
             if row['default'] not in [None, np.nan, '', np.NaN]:
-                # print(row['default'])
-                # print('okkkk')
+                print(row['default'])
+                print('okkkk')
                 for col in df_.columns:
                     if str(col).startswith('conf-'):
                         df_.at[row.name, col] = row['default']

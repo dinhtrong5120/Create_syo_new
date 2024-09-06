@@ -23,4 +23,4 @@ if __name__ == '__main__':
     file_path = r"C:\Users\KNT21617\Downloads\newken\仕様表\仕様表_PZ1K_copy - Copy.xlsx"
     df = pd.read_excel(file_path)
     results = check_optioncode(df)
-    # print(results)
+    print(results)

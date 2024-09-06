@@ -45,4 +45,4 @@ if __name__ == "__main__":
     df = pd.read_excel(r"C:\Users\KNT21617\Downloads\newken\project\data\input_syo\CAR 1.xlsx")
     print(df['CADICS ID'])
     list_error, duplicated_elements = check_syo(df)
-    # print(list_error, duplicated_elements)
+    print(list_error, duplicated_elements)

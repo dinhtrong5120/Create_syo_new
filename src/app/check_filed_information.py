@@ -92,7 +92,7 @@ def check_key_spec_new(file_name):
         dict_sub['SHEET_NAME'] = '✕'
         flg_check_fail = True
         df = pd.DataFrame([dict_sub])
-        # streamlit.write(df)
+        streamlit.write(df)
         return df, flg_check_fail
 
     list_key_word_1 = df.iloc[14].tolist()
@@ -123,7 +123,7 @@ def normalize_japanese_text(input_text):
         for char in input_text:
             normalized_char = unicodedata.normalize('NFKC', char)
             normalized_text += normalized_char
-        # normalized_text = normalized_text.replace("\n", "")
+        normalized_text = normalized_text.replace("”", "\"")
         normalized_text = normalized_text.strip()
         return normalized_text
     else:

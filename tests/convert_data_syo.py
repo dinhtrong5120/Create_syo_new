@@ -189,7 +189,7 @@ def dataframe_convert(file_path, project_name, result_querry_region_4_gray, resu
         else:
             df_cleaned = df_end.dropna(subset=['Gr', 'CADICS ID', 'auto'], how='all')
         df_cleaned.drop(index=delete_cells, inplace=True)
-        df_cleaned['CADICS ID'] = df_cleaned['CADICS ID'].apply(str.upper)
+        df_cleaned['CADICS ID'] = df_cleaned['CADICS ID'].astype(str).apply(str.upper)
         return df_cleaned, df_optioncode
 
 

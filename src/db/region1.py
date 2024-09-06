@@ -5,6 +5,8 @@ import streamlit
 
 def region_1(result_querry_region1):
     data = []
+    list_sap_xep_0 = ["CCM", "ZONE", "BODY", "ENGINE", "AXLE", "HANDLE", "GRADE", "TRANS", "YEAR", "INTAKE", "SEAT",
+                      "NUMBER"]
     for project in result_querry_region1:
         data.append({
             'auto': project.auto_infor,
@@ -15,6 +17,10 @@ def region_1(result_querry_region1):
 
     df_1 = pd.DataFrame(data)
     df_1 = df_1.replace('null', None)
+    df_1['device_name_order'] = df_1['CADICS ID'].apply(
+        lambda x: list_sap_xep_0.index(x) if x in list_sap_xep_0 else len(list_sap_xep_0))
+    df_1 = df_1.sort_values(by=['device_name_order'])
+    df_1 = df_1.drop(columns=['device_name_order'])
     return df_1
 
 

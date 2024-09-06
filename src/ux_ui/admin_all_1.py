@@ -272,7 +272,7 @@ def admin_all_1():
                                 check_optioncode(st.session_state.data_frame_combine)
 
                                 if not check_optioncode(st.session_state.data_frame_combine):
-                                    # st.write('ok')
+                                    st.write('ok')
                                     if st.session_state.code != '':
                                         form_syo = create_syo(st.session_state.data_frame_combine,
                                                           get_data("data_for_create"))
@@ -297,11 +297,11 @@ def admin_all_1():
                                         st.warning("Model code can not be left blank")
                                         st.session_state.message_7 = 'Model code can not be left blank'
                                 else:
-                                    # st.write('OptionCode empty')
+                                    st.write('OptionCode empty')
                                     st.session_state.message_7 = 'OptionCode empty'
                                     time.sleep(1.5)
                             else:
-                                # st.write('ok')
+                                st.write('ok')
                                 st.warning("OptionCode empty")
                                 st.session_state.message_7 = 'OptionCode empty'
                         else:
@@ -407,7 +407,7 @@ def admin_all_1():
         except Exception as e:
             print(e)
             st.write(e)
-            # st.write('st.session_state.selected_option: ',st.session_state.selected_option)
+            st.write('st.session_state.selected_option: ',st.session_state.selected_option)
     with col_right:
         # BANNER RIGHT
         col_r1, col_r2 = st.columns([2, 1])

@@ -115,46 +115,47 @@ def update_file_after_edit(code, pwt, plant, case, file_updates, csrf_token, nam
         return ""
 
 
-def extract(file_path, output_dir):
-    # Tạo thư mục đích nếu nó chưa tồn tại
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    seven_zip_path = shutil.which("7z")
-
-    # Nếu không tìm thấy 7z trong PATH, sử dụng đường dẫn mặc định
-    if seven_zip_path is None:
-        seven_zip_path = "C:\\Program Files\\7-Zip\\7z.exe"  # Thay thế bằng đường dẫn đầy đủ đến 7z.exe nếu cần
-
-    if not os.path.exists(seven_zip_path):
-        raise FileNotFoundError(
-            f"The command '{seven_zip_path}' was not found. Please install it or add it to your PATH.")
-
-    if ".zip" in file_path:
-        subprocess.run([seven_zip_path, "x", file_path, f"-o{output_dir}", "-y"])
-        folder = file_path[:-4]  # Lấy đường dẫn mà không có phần mở rộng .zip
-
-    if ".7z" in file_path:
-        subprocess.run([seven_zip_path, "x", file_path, f"-o{output_dir}", "-y"])
-        folder = file_path[:-3]  # Lấy đường dẫn mà không có phần mở rộng .7z
-    move_all_items(folder, output_dir)
-    delete_folder(folder)
-
-
 # def extract(file_path, output_dir):
 #     # Tạo thư mục đích nếu nó chưa tồn tại
 #     if not os.path.exists(output_dir):
 #         os.makedirs(output_dir)
-#     # Giải nén tệp .7z vào thư mục đích
-#     # subprocess.run(["7z","x",file_path,f"-o{output_dir}","-mcp=UTF-8"])
-#     # patoolib.extract_archive(file_path, outdir=output_dir)
+#     seven_zip_path = shutil.which("7z")
+#
+#     # Nếu không tìm thấy 7z trong PATH, sử dụng đường dẫn mặc định
+#     if seven_zip_path is None:
+#         seven_zip_path = "C:\\Program Files\\7-Zip\\7z.exe"  # Thay thế bằng đường dẫn đầy đủ đến 7z.exe nếu cần
+#
+#     if not os.path.exists(seven_zip_path):
+#         raise FileNotFoundError(
+#             f"The command '{seven_zip_path}' was not found. Please install it or add it to your PATH.")
+#
 #     if ".zip" in file_path:
-#         subprocess.run(["unar", file_path, "-o", output_dir])
-#         folder = file_path[0:len(file_path) - 4]
+#         subprocess.run([seven_zip_path, "x", file_path, f"-o{output_dir}", "-y"])
+#         folder = file_path[:-4]  # Lấy đường dẫn mà không có phần mở rộng .zip
+#         # if "仕様表" not in file_path:
+#         #     move_all_items(folder, output_dir)
+#         #     delete_folder(folder)
 #     if ".7z" in file_path:
-#         subprocess.run(["7z", "x", file_path, f"-o{output_dir}"])
-#         folder = file_path[0:len(file_path) - 3]
-#     move_all_items(folder, output_dir)
-#     delete_folder(folder)
+#         subprocess.run([seven_zip_path, "x", file_path, f"-o{output_dir}", "-y"])
+#         folder = file_path[:-3]  # Lấy đường dẫn mà không có phần mở rộng .7z
+#         # if "仕様表" not in file_path:
+#         #     move_all_items(folder, output_dir)
+#         #     delete_folder(folder)
+
+
+def extract(file_path, output_dir):
+    # Tạo thư mục đích nếu nó chưa tồn tại
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    # Giải nén tệp .7z vào thư mục đích
+    # subprocess.run(["7z","x",file_path,f"-o{output_dir}","-mcp=UTF-8"])
+    # patoolib.extract_archive(file_path, outdir=output_dir)
+    if ".zip" in file_path:
+        subprocess.run(["unar", file_path, "-o", output_dir])
+        folder = file_path[0:len(file_path) - 4]
+    if ".7z" in file_path:
+        subprocess.run(["7z", "x", file_path, f"-o{output_dir}"])
+        folder = file_path[0:len(file_path) - 3]
 
 
 def move_all_items(source_dir, destination_dir):
@@ -173,6 +174,6 @@ def move_all_items(source_dir, destination_dir):
 def delete_folder(folder_path):
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
-        # print(f'Thư mục {folder_path} đã được xóa.')
+        print(f'Thư mục {folder_path} đã được xóa.')
     else:
         print(f'Thư mục {folder_path} không tồn tại.')
